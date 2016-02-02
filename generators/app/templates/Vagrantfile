@@ -1,0 +1,21 @@
+Vagrant.configure(2) do |config|
+ 
+  config.vm.box = "puppetlabs/centos-7.0-64-puppet"
+  config.vm.hostname = '<%= hostname %>'
+  config.vm.network :private_network, ip: "<%= privateIp %>"
+  config.vm.synced_folder "<%= appName %>", "/home/vagrant/<%= appName %>"
+
+  <% if (provision) { %>
+  system "vagrant plugin install vagrant-r10k" unless Vagrant.has_plugin? "vagrant-r10k"
+
+  config.vm.provision "puppet" do |puppet|
+      puppet.environment_path = "puppet/environments"
+      puppet.environment = "devel"
+      puppet.module_path = ["puppet/environments/devel/modules", "puppet/environments/devel/vendor"]
+  end
+
+  config.r10k.puppet_dir = "puppet"
+  config.r10k.puppetfile_path = "puppet/environments/devel/Puppetfile"
+  config.r10k.module_path = "puppet/environments/devel/vendor"
+  <% } %>
+end

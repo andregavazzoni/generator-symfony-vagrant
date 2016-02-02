@@ -1,0 +1,6 @@
+mod 'puppetlabs/stdlib'
+mod 'puppetlabs/gcc'
+mod 'treydock/gpg_key'
+mod 'puppetlabs/nodejs'
+mod 'puppetlabs/concat'
+mod 'puppetlabs/postgresql'

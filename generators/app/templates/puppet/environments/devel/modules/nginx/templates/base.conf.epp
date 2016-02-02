@@ -1,0 +1,35 @@
+server {
+    server_name <%= hostname %>;
+    listen 80;
+    root /home/vagrant/<%= appName %>/web;
+
+    location / {
+        # try to serve file directly, fallback to app.php
+        try_files $uri /app_dev.php$is_args$args;
+    }
+
+    # DEV
+    # This rule should only be placed on your development environment
+    # In production, don't include this and don't deploy app_dev.php or config.php
+
+    location ~ ^/(app_dev|config)\.php(/|$) {
+        fastcgi_pass unix:/var/run/<%= appName %>.sock;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+    }
+
+    # PROD
+    location ~ ^/app\.php(/|$) {
+        fastcgi_pass unix:/var/run/<%= appName %>.sock;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+        internal;
+    }
+
+    error_log /var/log/nginx/project_error.log;
+    access_log /var/log/nginx/project_access.log;
+}
