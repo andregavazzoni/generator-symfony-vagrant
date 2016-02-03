@@ -3,10 +3,14 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 var replace = require('replace');
+var exec = require('child_process').exec;
 
 module.exports = yeoman.generators.Base.extend({
   initializing: function() {
-    this.spawnCommand('vagrant', ['destroy', '--force']);
+    var done = this.async();
+    this.spawnCommand('vagrant', ['destroy', '--force']).on('exit', function(){
+      done();
+    }.bind(this));
   },
 
   prompting: function () {
@@ -14,7 +18,7 @@ module.exports = yeoman.generators.Base.extend({
 
     // Have Yeoman greet the user.
     this.log(yosay(
-      'Welcome to the' + chalk.red('Symfony-Vagrant') + ' generator!'
+      'Welcome to the ' + chalk.red('Symfony-Vagrant') + ' generator!'
     ));
 
     var prompts = [{
@@ -36,6 +40,11 @@ module.exports = yeoman.generators.Base.extend({
       type: 'confirm',
       name: 'provision',
       message: 'Last, tell us if you want to use our ' + chalk.yellow('Puppet Provisioning') + ':',
+      default: true
+    }, {
+      type: 'confirm',
+      name: 'editHosts',
+      message: 'Would you like to update your hosts file ? (sudo required)',
       default: true
     }];
 
@@ -114,7 +123,27 @@ module.exports = yeoman.generators.Base.extend({
     }.bind(this));
   },
 
-  install: function () {
-    this.spawnCommand('vagrant', ['up']);
-  }
+  install: {
+    hosts: function() {
+      if (this.props.editHosts) {
+        var done = this.async();
+        this.log(chalk.yellow('We\'ll need to run the next step as SUDO'));
+        exec('sudo sed \'$ i\\' + this.props.privateIp + ' ' + this.props.hostname + '\' /etc/hosts -i', (err, stdout, stderr) => {
+          if (err) {
+            this.log(err);
+            return;
+          } 
+          done();
+          this.log(chalk.green('Hosts file updated'));
+        });
+      }
+    },
+
+    vagrant: function() {
+      var done = this.async();
+      this.spawnCommand('vagrant', ['up']).on('exit', function() {
+        done();
+      }.bind(this));
+    }
+  } 
 });
