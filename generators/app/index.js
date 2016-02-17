@@ -6,11 +6,11 @@ var replace = require('replace');
 var exec = require('child_process').exec;
 
 module.exports = yeoman.generators.Base.extend({
-  initializing: function() {
+  initializing: function () {
     var done = this.async();
-    this.spawnCommand('vagrant', ['destroy', '--force']).on('exit', function(){
+    this.spawnCommand('vagrant', ['destroy', '--force']).on('exit', function () {
       done();
-    }.bind(this));
+    });
   },
 
   prompting: function () {
@@ -30,7 +30,7 @@ module.exports = yeoman.generators.Base.extend({
       type: 'input',
       name: 'hostname',
       message: 'And know a ' + chalk.yellow('hostname') + ' (Keep it simple):',
-      default: this.appname + ".local"
+      default: this.appname + '.local'
     }, { 
       type: 'input',
       name: 'privateIp',
@@ -55,7 +55,7 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   writing: {
-    vagrant: function() {
+    vagrant: function () {
       this.mkdir(this.props.appName);
 
       this.fs.copyTpl(
@@ -69,7 +69,7 @@ module.exports = yeoman.generators.Base.extend({
       );
     },
 
-    puppet: function() {
+    puppet: function () {
       var puppetDir = 'puppet/environments/devel/';
 
       this.mkdir(puppetDir + 'vendor');
@@ -77,9 +77,9 @@ module.exports = yeoman.generators.Base.extend({
       this.fs.copy(
         this.templatePath(puppetDir + 'Puppetfile'),
         this.destinationPath(puppetDir + 'Puppetfile')
-      )
+      );
 
-      //Puppet Manifests
+      // Puppet Manifests
       this.fs.copyTpl(
         this.templatePath(puppetDir + 'manifests/site.pp'),
         this.destinationPath(puppetDir + 'manifests/site.pp'), {
@@ -87,7 +87,7 @@ module.exports = yeoman.generators.Base.extend({
         }
       );
 
-      //Puppet Modules
+      // Puppet Modules
       this.fs.copyTpl(
         this.templatePath(puppetDir + 'modules/nginx/templates/base.conf.epp'),
         this.destinationPath(puppetDir + 'modules/nginx/templates/' + this.props.appName + '.conf.epp'), {
@@ -105,18 +105,18 @@ module.exports = yeoman.generators.Base.extend({
     }
   },
 
-  installSymfony: function() {
+  installSymfony: function () {
     var done = this.async();
 
-    this.spawnCommand('composer', 
-      ['create-project', 'symfony/framework-standard-edition', this.props.appName], 
+    this.spawnCommand('composer',
+      ['create-project', 'symfony/framework-standard-edition', this.props.appName],
       {cwd: this.appName}
-    ).on('exit', function() { 
+    ).on('exit', function () { 
       var allowedIp = this.props.privateIp.match(/(\d+.\d+.\d+.)(\d+)/);
       replace({
         regex: "(\\$_SERVER\\['REMOTE_ADDR'\\], \\[)(.*)",
-        replacement: '$1 \''+ allowedIp[1] +'1\', $2',
-        paths: [this.props.appName + "/web/app_dev.php"]
+        replacement: '$1 \'' + allowedIp[1] + '1\', $2',
+        paths: [this.props.appName + '/web/app_dev.php']
       });
 
       done();
@@ -124,26 +124,26 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   install: {
-    hosts: function() {
+    hosts: function () {
       if (this.props.editHosts) {
         var done = this.async();
         this.log(chalk.yellow('We\'ll need to run the next step as SUDO'));
-        exec('sudo sed \'$ i\\' + this.props.privateIp + ' ' + this.props.hostname + '\' /etc/hosts -i', (err, stdout, stderr) => {
+        exec('sudo sed \'$ i\\' + this.props.privateIp + ' ' + this.props.hostname + '\' /etc/hosts -i', (err, stdout) => {
           if (err) {
             this.log(err);
             return;
-          } 
+          }
           done();
           this.log(chalk.green('Hosts file updated'));
         });
       }
     },
 
-    vagrant: function() {
+    vagrant: function () {
       var done = this.async();
       this.spawnCommand('vagrant', ['up']).on('exit', function() {
         done();
-      }.bind(this));
+      });
     }
-  } 
+  }
 });
