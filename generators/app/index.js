@@ -31,11 +31,11 @@ module.exports = yeoman.generators.Base.extend({
       name: 'hostname',
       message: 'And know a ' + chalk.yellow('hostname') + ' (Keep it simple):',
       default: this.appname + '.local'
-    }, { 
+    }, {
       type: 'input',
       name: 'privateIp',
       message: 'Choose a nice ' + chalk.yellow('Private IP Address') + ' for your VM:',
-      default: "192.168.100.10"
+      default: '192.168.100.10'
     }, {
       type: 'confirm',
       name: 'provision',
@@ -109,12 +109,12 @@ module.exports = yeoman.generators.Base.extend({
     var done = this.async();
 
     this.spawnCommand('composer',
-      ['create-project', 'symfony/framework-standard-edition', this.props.appName],
+      ['create-project', 'symfony/framework-standard-edition', this.props.appName, '-n'],
       {cwd: this.appName}
-    ).on('exit', function () { 
+    ).on('exit', function () {
       var allowedIp = this.props.privateIp.match(/(\d+.\d+.\d+.)(\d+)/);
       replace({
-        regex: "(\\$_SERVER\\['REMOTE_ADDR'\\], \\[)(.*)",
+        regex: '(\\$_SERVER\\[\'REMOTE_ADDR\'\\], \\[)(.*)',
         replacement: '$1 \'' + allowedIp[1] + '1\', $2',
         paths: [this.props.appName + '/web/app_dev.php']
       });
@@ -128,7 +128,7 @@ module.exports = yeoman.generators.Base.extend({
       if (this.props.editHosts) {
         var done = this.async();
         this.log(chalk.yellow('We\'ll need to run the next step as SUDO'));
-        exec('sudo sed \'$ i\\' + this.props.privateIp + ' ' + this.props.hostname + '\' /etc/hosts -i', (err, stdout) => {
+        exec('sudo sed \'$ i\\' + this.props.privateIp + ' ' + this.props.hostname + '\' /etc/hosts -i', err => {
           if (err) {
             this.log(err);
             return;
@@ -141,7 +141,7 @@ module.exports = yeoman.generators.Base.extend({
 
     vagrant: function () {
       var done = this.async();
-      this.spawnCommand('vagrant', ['up']).on('exit', function() {
+      this.spawnCommand('vagrant', ['up']).on('exit', function () {
         done();
       });
     }
