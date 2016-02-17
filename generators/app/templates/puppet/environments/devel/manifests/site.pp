@@ -70,7 +70,8 @@ $php = [
   'php70w-xml',
   'php70w-intl',
   'php70w-opcache',
-  'php70w-process'
+  'php70w-process',
+  'php70w-pecl-apcu.x86_64'
 ]
 package { $php:
   ensure  => 'installed',
