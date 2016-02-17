@@ -7,10 +7,12 @@ var exec = require('child_process').exec;
 
 module.exports = yeoman.generators.Base.extend({
   initializing: function () {
-    var done = this.async();
-    this.spawnCommand('vagrant', ['destroy', '--force']).on('exit', function () {
-      done();
-    });
+    if (this.fs.exists('Vagrantfile')) {
+      var done = this.async();
+      this.spawnCommand('vagrant', ['destroy', '--force']).on('exit', function () {
+        done();
+      });
+    }
   },
 
   prompting: function () {
@@ -45,7 +47,12 @@ module.exports = yeoman.generators.Base.extend({
       type: 'confirm',
       name: 'editHosts',
       message: 'Would you like to update your hosts file ? (sudo required)',
-      default: true
+      default: false
+    }, {
+      type: 'confirm',
+      name: 'launchVM',
+      message: 'Would you like to launch your VM now ?',
+      default: false
     }];
 
     this.prompt(prompts, function (props) {
@@ -140,10 +147,12 @@ module.exports = yeoman.generators.Base.extend({
     },
 
     vagrant: function () {
-      var done = this.async();
-      this.spawnCommand('vagrant', ['up']).on('exit', function () {
-        done();
-      });
+      if (this.props.launchVM) {
+        var done = this.async();
+        this.spawnCommand('vagrant', ['up']).on('exit', function () {
+          done();
+        });
+      }
     }
   }
 });
