@@ -115,7 +115,7 @@ module.exports = yeoman.generators.Base.extend({
   installSymfony: function () {
     var done = this.async();
 
-    this.spawnCommand('coamposer',
+    this.spawnCommand('composer',
       ['create-project', 'symfony/framework-standard-edition', this.props.appName, '-n'],
       {cwd: this.appName}
     )
