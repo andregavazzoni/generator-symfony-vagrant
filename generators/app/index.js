@@ -115,10 +115,14 @@ module.exports = yeoman.generators.Base.extend({
   installSymfony: function () {
     var done = this.async();
 
-    this.spawnCommand('composer',
+    this.spawnCommand('coamposer',
       ['create-project', 'symfony/framework-standard-edition', this.props.appName, '-n'],
       {cwd: this.appName}
-    ).on('exit', function () {
+    )
+    .on('error', function () { 
+      this.log(chalk.red('Composer not installed.'))
+    }.bind(this))
+    .on('exit', function () {
       var allowedIp = this.props.privateIp.match(/(\d+.\d+.\d+.)(\d+)/);
       replace({
         regex: '(\\$_SERVER\\[\'REMOTE_ADDR\'\\], \\[)(.*)',
