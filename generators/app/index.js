@@ -119,8 +119,8 @@ module.exports = yeoman.generators.Base.extend({
       ['create-project', 'symfony/framework-standard-edition', this.props.appName, '-n'],
       {cwd: this.appName}
     )
-    .on('error', function () { 
-      this.log(chalk.red('Composer not installed.'))
+    .on('error', function () {
+      this.log(chalk.red('Composer not installed.'));
     }.bind(this))
     .on('exit', function () {
       var allowedIp = this.props.privateIp.match(/(\d+.\d+.\d+.)(\d+)/);
