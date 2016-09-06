@@ -1,4 +1,4 @@
-# generator-symfony-vagrant [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
+# generator-symfony-vagrant [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url] [![StackShare](http://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](http://stackshare.io/andregavazzoni/generator-symfony-vagrant)
 > Creates a Symfony 3 Application using Vagrant with PHP 7 and PostgreSQL
 
 ## Installation
